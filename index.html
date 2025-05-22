@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Verisure - Recrutement</title>
+  <style>
+    /* Styles identiques, inchangés */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f6f6f6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: #d71920;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    header img {
+      height: 40px;
+      margin-right: 15px;
+    }
+
+    header span {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    main {
+      flex: 1;
+      max-width: 500px;
+      margin: 60px auto;
+      padding: 30px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input {
+      padding: 12px;
+      font-size: 18px;
+      width: 80%;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      border-color: #d71920;
+      outline: none;
+    }
+
+    #link {
+      margin-top: 25px;
+      font-size: 18px;
+      display: none;
+    }
+
+    #link a {
+      color: #d71920;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    #link a:hover {
+      text-decoration: underline;
+    }
+
+    .error {
+      color: #d71920;
+      font-weight: bold;
+    }
+
+    footer {
+      background-color: #d71920;
+      color: white;
+      text-align: center;
+      padding: 15px 10px;
+      font-size: 16px;
+    }
+
+    footer a {
+      color: white;
+      text-decoration: underline;
+      font-weight: bold;
+    }
+
+    footer a:hover {
+      text-decoration: none;
+      opacity: 0.9;
+    }
+
+    @media (max-width: 600px) {
+      main {
+        margin: 20px 15px;
+        padding: 20px;
+      }
+
+      h2 {
+        font-size: 18px;
+        margin-bottom: 15px;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+      }
+
+      #link {
+        font-size: 16px;
+        margin-top: 20px;
+      }
+
+      header {
+        flex-direction: column;
+        padding: 10px 15px;
+      }
+
+      header img {
+        margin-bottom: 10px;
+        height: 35px;
+      }
+
+      header span {
+        font-size: 22px;
+      }
+
+      footer {
+        font-size: 14px;
+        padding: 12px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo-verisure.png" alt="Logo Verisure" />
+    <span>Verisure</span>
+  </header>
+
+  <main>
+    <h2>Entrez votre code postal pour participer à votre entretien</h2>
+    <input type="text" id="postalCode" placeholder="ex : 75000" maxlength="5" />
+    <div id="link"></div>
+  </main>
+
+  <footer>
+    Envie de rejoindre nos équipes ? <a href="https://careers.verisure.com/global/en" target="_blank">Consultez nos offres</a>
+  </footer>
+
+  <script>
+  const input = document.getElementById("postalCode");
+  const linkDiv = document.getElementById("link");
+
+  let specialCodes = {};
+
+  // Charger le JSON au chargement de la page
+  fetch('data.json')
+    .then(response => response.json())
+    .then(data => {
+      specialCodes = data; // stocke l'objet { "75000": "url", "69000": "url", ... }
+    })
+    .catch(error => {
+      console.error('Erreur lors du chargement du JSON:', error);
+    });
+
+  input.addEventListener("input", () => {
+    const code = input.value.trim();
+
+    if (/^\d{5}$/.test(code)) {
+      if (specialCodes.hasOwnProperty(code)) {
+        const url = specialCodes[code];
+        linkDiv.innerHTML = `<a href="${url}" target="_blank">Cliquer ici pour planifier votre entretien</a>`;
+      } else {
+        linkDiv.innerHTML = `<span class="error">Code inconnu, veuillez indiquer le code de la ville la plus proche.</span>`;
+      }
+      linkDiv.style.display = "block";
+    } else {
+      linkDiv.style.display = "none";	
+    }
+  });
+</script>
+
+</body>
+</html>
