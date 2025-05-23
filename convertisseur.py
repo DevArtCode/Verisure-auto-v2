@@ -1,22 +1,42 @@
 import pandas as pd
 import json
+import os
 
-# Lire le fichier Excel
-df = pd.read_excel('codes.xlsx')
+# --- ÉTAPE 1 : Chargement du fichier Excel ---
+excel_path = 'Codes.xlsx'  # Change ici si le fichier est dans un autre dossier
 
-# Vérifier les noms de colonnes
-print("Colonnes trouvées dans Excel :", df.columns.tolist())
+if not os.path.exists(excel_path):
+    print(f"❌ Fichier introuvable : {excel_path}")
+    exit()
 
-# Créer un dictionnaire avec les codes comme clés
-data = {}
+try:
+    df = pd.read_excel(excel_path, dtype={'Code Postal': str})
+    print("✅ Fichier Excel chargé avec succès.")
+except Exception as e:
+    print("❌ Erreur lors de la lecture du fichier Excel :")
+    print(e)
+    exit()
 
-for _, row in df.iterrows():
-    code = str(row['Code Postal']).strip()
-    url = str(row['url']).strip()
-    data[code] = url
+# --- ÉTAPE 2 : Traitement des données et création du JSON ---
+try:
+    print("Colonnes détectées :", df.columns.tolist())
 
-# Écrire dans data.json
-with open('data.json', 'w', encoding='utf-8') as f:
-    json.dump(data, f, indent=2, ensure_ascii=False)
+    data = {}
+    for _, row in df.iterrows():
+        code = row['Code Postal'].zfill(5).strip()
+        url = str(row['url']).strip()
+        data[code] = url
 
-print("data.json créé avec succès !")
+    # Écrire dans data.json
+    with open('data.json', 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+    print("✅ data.json créé avec succès !")
+
+except KeyError as e:
+    print("❌ Nom de colonne incorrect. Vérifie bien qu'il y a une colonne 'Code Postal' et une 'url'")
+    print(e)
+
+except Exception as e:
+    print("❌ Erreur inattendue pendant le traitement des données :")
+    print(e)
